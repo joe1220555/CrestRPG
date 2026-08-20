@@ -1,0 +1,81 @@
+api-base-url: "https://example.com/api/bridge/v1"
+api-token: "CHANGE_ME"
+server-key: "example-server"
+poll-seconds: 15
+
+
+# 以下遊戲規則會在網站發布後由 gameplay manifest 覆蓋；這些值也是首次啟動與離線備援預設值。
+attributes:
+  max-level: 100
+  strength-damage-percent: 1.0
+  dexterity-speed-percent: 0.2
+  dexterity-dodge-percent: 0.1
+  intelligence-mana-bonus: 2.0
+  intelligence-magic-damage-percent: 1.5
+  vitality-health-bonus: 0.5
+mana:
+  base-max-mana: 100.0
+  base-regen-per-second: 5.0
+  regen-per-intelligence: 0.1
+skills:
+  formula:
+    base-xp: 100
+    exponent: 1.5
+  ap-per-level: 2
+  # 網站技能的 command 效果預設禁止；只有完全信任網站管理員時才開啟。
+  allow-console-command-effects: false
+progression:
+  max-character-level: 100
+  skill-points-per-level: 1
+  character-xp:
+    base: 250.0
+    exponent: 1.6
+    skill-xp-conversion: 0.25
+
+class-skills:
+  leveling:
+    max-level: 20
+    base-xp: 100.0
+    exponent: 1.45
+    xp-per-cast: 5.0
+actionbar:
+  enabled: true
+  format: "§c❤️ 生命值: {hp}/{max_hp}  §b⚡ 法力值: {mana}/{max_mana}"
+database:
+  use-mysql: false
+  host: "localhost"
+  port: 3306
+  database: "crest_rpg"
+  username: "root"
+  password: ""
+  ssl: false
+sort-inventory:
+  enabled: true
+  mana-cost: 5.0
+  cooldown-seconds: 2
+  sort-mode: TYPE
+  include-hotbar: false
+sort-chest:
+  enabled: true
+  mana-cost: 5.0
+  cooldown-seconds: 2
+  require-sneak: true
+  sort-mode: TYPE
+
+# 玩家物品操作；網站可使用 item-operations gameplay 區段覆蓋。
+item-operations:
+  identification:
+    material: AMETHYST_SHARD
+    amount: 1
+  upgrade:
+    material: NETHERITE_SCRAP
+    base-amount: 1
+    success-base: 0.90
+    success-penalty-per-level: 0.04
+    minimum-success: 0.20
+  socket:
+    additional-material: LAPIS_LAZULI
+    additional-amount: 8
+  salvage:
+    material: EMERALD
+    value-per-item: 10.0

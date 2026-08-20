@@ -1,0 +1,56 @@
+# CrestRPG 任務設定檔
+
+Quest_Beginner_1:
+  Title: "§a🌟 新手冒險的起點 (主線)"
+  Type: MAIN
+  Description:
+    - "歡迎來到克雷斯特冒險世界！"
+    - "請先擊殺 5 隻普通的殭屍，"
+    - "並收集 10 個小麥，然後找村長提交。"
+  NPC: "村長"
+  Prerequisite: ""
+  Objectives:
+    - Type: KILL
+      Target: ZOMBIE
+      Count: 5
+      Display: "擊殺殭屍"
+    - Type: COLLECT
+      Target: WHEAT
+      Count: 10
+      Display: "收集 10 個小麥"
+  Rewards:
+    Money: 500
+    VanillaXP: 100
+    SkillsXP:
+      FARMING: 500
+    Items:
+      - Material: IRON_SWORD
+        Amount: 1
+      - Material: BREAD
+        Amount: 16
+      - Content: magic_fragment
+        Amount: 2
+
+Quest_Side_Guard:
+  Title: "§d☠ 討伐亡靈守衛 (支線)"
+  Type: SIDE
+  Description:
+    - "城堡廢墟的亡靈守衛正在威脅村民！"
+    - "請前往擊殺 3 隻亡靈守衛以維護和平。"
+  NPC: "護衛隊長"
+  Prerequisite: "Quest_Beginner_1"
+  Objectives:
+    - Type: KILL
+      Target: "CrestMob:UndeadGuard" # 擊殺自訂怪物 UndeadGuard
+      Count: 3
+      Display: "擊殺亡靈守衛"
+  Rewards:
+    Money: 1200
+    VanillaXP: 200
+    SkillsXP:
+      COMBAT: 1000
+    Items:
+      - Material: GOLDEN_APPLE
+        Amount: 2
+      - Content: magic_essence
+        Amount: 1

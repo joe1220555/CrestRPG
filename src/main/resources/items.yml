@@ -1,0 +1,122 @@
+items:
+  excalibur:
+    material: DIAMOND_SWORD
+    display-name: "&e&l神劍·艾克斯卡里巴"
+    custom-model-data: 10001
+    lore:
+      - "&7傳說中亞瑟王所持有的神劍，散發著金色光芒。"
+      - ""
+      - "&6裝備屬性加成："
+      - " &c⚔️ +15 力量 (Strength)"
+      - " &b🔮 +5 智慧 (Intelligence)"
+      - ""
+      - "&c⚠️ 限制: 需要戰鬥等級 15 級才可使用"
+    stats:
+      strength: 15
+      intelligence: 5
+    requirements:
+      combat: 15
+
+  bow_of_artemis:
+    material: BOW
+    display-name: "&a&l阿提米絲之弓"
+    custom-model-data: 10002
+    lore:
+      - "&7狩獵女神阿提米絲的月光銀弓，蘊含月之神力。"
+      - ""
+      - "&6裝備屬性加成："
+      - " &a🏹 +20 敏捷 (Dexterity)"
+      - ""
+      - "&c⚠️ 限制: 需要弓箭等級 15 級才可使用"
+    stats:
+      dexterity: 20
+    requirements:
+      archery: 15
+
+  merlin_staff:
+    material: BLAZE_ROD
+    display-name: "&b&l梅林大魔導士之杖"
+    custom-model-data: 10003
+    lore:
+      - "&7大魔導士梅林傳承下來的古老法杖，鑲嵌著旋渦藍水晶。"
+      - ""
+      - "&6裝備屬性加成："
+      - " &b🔮 +25 智慧 (Intelligence)"
+      - ""
+      - "&c⚠️ 限制: 需要魔法等級 15 級才可使用"
+    stats:
+      intelligence: 25
+    requirements:
+      sorcery: 15
+
+  valkyrie_helmet:
+    material: IRON_HELMET
+    display-name: "&d&l女武神頭盔"
+    custom-model-data: 10011
+    lore:
+      - "&7女武神瓦爾基麗穿戴的飛翼金盔。"
+      - ""
+      - "&6裝備屬性加成："
+      - " &c⚔️ +8 力量 (Strength)"
+      - " &9🛡️ +5 生命 (Vitality)"
+      - ""
+      - "&c⚠️ 限制: 需要防禦等級 10 級才可使用"
+    stats:
+      strength: 8
+      vitality: 5
+    requirements:
+      defense: 10
+
+  valkyrie_chestplate:
+    material: IRON_CHESTPLATE
+    display-name: "&d&l女武神胸甲"
+    custom-model-data: 10012
+    lore:
+      - "&7雕刻有黃金飛翼的堅固胸甲，散發神聖氣息。"
+      - ""
+      - "&6裝備屬性加成："
+      - " &c⚔️ +12 力量 (Strength)"
+      - " &9🛡️ +10 生命 (Vitality)"
+      - ""
+      - "&c⚠️ 限制: 需要防禦等級 12 級才可使用"
+    stats:
+      strength: 12
+      vitality: 10
+    requirements:
+      defense: 12
+
+  valkyrie_leggings:
+    material: IRON_LEGGINGS
+    display-name: "&d&l女武神護腿"
+    custom-model-data: 10013
+    lore:
+      - "&7兼顧敏捷與防禦的女武神金屬護腿。"
+      - ""
+      - "&6裝備屬性加成："
+      - " &c⚔️ +10 力量 (Strength)"
+      - " &9🛡️ +8 生命 (Vitality)"
+      - ""
+      - "&c⚠️ 限制: 需要防禦等級 11 級才可使用"
+    stats:
+      strength: 10
+      vitality: 8
+    requirements:
+      defense: 11
+
+  valkyrie_boots:
+    material: IRON_BOOTS
+    display-name: "&d&l女武神戰靴"
+    custom-model-data: 10014
+    lore:
+      - "&7能踏風而行的女武神戰靴。"
+      - ""
+      - "&6裝備屬性加成："
+      - " &c⚔️ +6 力量 (Strength)"
+      - " &9🛡️ +4 生命 (Vitality)"
+      - ""
+      - "&c⚠️ 限制: 需要防禦等級 10 級才可使用"
+    stats:
+      strength: 6
+      vitality: 4
+    requirements:
+      defense: 10

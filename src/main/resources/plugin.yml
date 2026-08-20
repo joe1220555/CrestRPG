@@ -1,0 +1,67 @@
+name: CrestRPG
+version: 2.0.0
+main: tw.crestnetwork.rpg.CrestRpgPlugin
+api-version: '26.2'
+author: Crest Network
+description: Website-managed standalone RPG engine for Crest Network.
+softdepend: [Oraxen, ModelEngine, PlaceholderAPI, Vault]
+commands:
+  skills:
+    description: 開啟 RPG 技能與屬性介面
+    aliases: [skill, profile]
+    usage: /skills
+  quests:
+    description: 開啟 RPG 任務介面
+    aliases: [quest, questgui]
+    usage: /quests
+  cls:
+    description: 開啟背包與箱子整理工具
+    aliases: [sortmenu]
+    usage: /cls [sort|toggle]
+  crestrpg:
+    description: Crest RPG 管理指令
+    usage: /crestrpg <reload|editor|list|weapons|equipments|items|spawn|give>
+    permission: crestrpg.admin
+  rpgitem:
+    description: 鑑定、強化、鑲嵌或分解 CrestRPG 物品
+    usage: /rpgitem <identify|upgrade|socket|salvage>
+    permission: crestrpg.use
+  rpgclass:
+    description: 查詢或選擇 CrestRPG 職業
+    usage: /rpgclass <list|info|choose>
+    permission: crestrpg.use
+  skilltree:
+    description: 開啟 CrestRPG 職業技能樹
+    aliases: [talents, talenttree]
+    usage: /skilltree
+    permission: crestrpg.use
+  rpgcraft:
+    description: 開啟 CrestRPG 自訂製作站
+    aliases: [craftstation]
+    usage: /rpgcraft [製作站代碼]
+    permission: crestrpg.use
+  rpgskill:
+    description: CrestRPG 職業技能與快捷列
+    aliases: [skillbar, abilities]
+    usage: /rpgskill <bar|list|cast|bind|unbind|use>
+    permission: crestrpg.use
+  party:
+    description: CrestRPG 隊伍與組隊管理
+    aliases: [rpgparty, p]
+    usage: /party [invite|accept|leave|gui]
+    permission: crestrpg.use
+  titles:
+    description: CrestRPG 稱號與成就管理
+    aliases: [title, rpgtitle]
+    usage: /titles
+    permission: crestrpg.use
+permissions:
+  crestrpg.use:
+    description: 使用玩家 RPG 技能介面
+    default: true
+  crestrpg.admin:
+    description: 管理與生成 Crest RPG 怪物、武器、裝備及物品
+    default: op
+  crestlifeskills.admin:
+    description: 管理 CrestRPG 整理工具
+    default: op
