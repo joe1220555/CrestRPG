@@ -50,8 +50,9 @@ public final class RpgDraftManager {
     public synchronized void loadAllDrafts() {
         draftsByKind.clear();
         String[] kinds = {
-                "items", "weapons", "equipments", "gems", "affixes", "sets",
-                "classes", "skills", "skill-trees", "monsters", "drop-tables", "crafting-stations"
+                "items", "weapons", "equipments", "gems", "affixes", "rarities", "sets",
+                "classes", "skills", "skill-trees", "monsters", "drop-tables", "crafting-stations",
+                "npcs"
         };
         for (String kind : kinds) {
             Map<String, JsonObject> map = new LinkedHashMap<>();

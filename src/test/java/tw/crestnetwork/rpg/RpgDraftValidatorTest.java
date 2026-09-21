@@ -57,4 +57,17 @@ final class RpgDraftValidatorTest {
         assertFalse(result.isValid());
         assertTrue(result.getErrors().stream().anyMatch(e -> e.contains("non_existent_set")));
     }
+
+    @Test
+    void testWeaponRarityReferenceIsValidated() {
+        JsonObject weapon = new JsonObject();
+        weapon.addProperty("key", "ember_blade");
+        weapon.addProperty("base_item", "minecraft:diamond_sword");
+        weapon.addProperty("rarity", "missing_epic");
+        draftManager.saveDraft("weapons", "ember_blade", weapon);
+
+        RpgDraftValidator.ValidationResult result = RpgDraftValidator.validate(draftManager);
+        assertFalse(result.isValid());
+        assertTrue(result.getErrors().stream().anyMatch(error -> error.contains("missing_epic")));
+    }
 }

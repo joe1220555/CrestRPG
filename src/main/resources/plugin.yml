@@ -1,9 +1,9 @@
 name: CrestRPG
-version: 2.0.0
+version: 2.1.0
 main: tw.crestnetwork.rpg.CrestRpgPlugin
 api-version: '26.2'
 author: Crest Network
-description: Website-managed standalone RPG engine for Crest Network.
+description: Standalone RPG engine with an in-game GUI editor for Crest Network.
 softdepend: [Oraxen, ModelEngine, PlaceholderAPI, Vault]
 commands:
   skills:

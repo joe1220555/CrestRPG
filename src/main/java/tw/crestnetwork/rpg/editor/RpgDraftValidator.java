@@ -43,6 +43,7 @@ public final class RpgDraftValidator {
         Map<String, JsonObject> equipments = allDrafts.getOrDefault("equipments", Map.of());
         Map<String, JsonObject> gems = allDrafts.getOrDefault("gems", Map.of());
         Map<String, JsonObject> affixes = allDrafts.getOrDefault("affixes", Map.of());
+        Map<String, JsonObject> rarities = allDrafts.getOrDefault("rarities", Map.of());
         Map<String, JsonObject> sets = allDrafts.getOrDefault("sets", Map.of());
         Map<String, JsonObject> classes = allDrafts.getOrDefault("classes", Map.of());
         Map<String, JsonObject> skills = allDrafts.getOrDefault("skills", Map.of());
@@ -62,6 +63,7 @@ public final class RpgDraftValidator {
         validateDraftGroup("equipments", equipments, errors, true);
         validateDraftGroup("gems", gems, errors, false);
         validateDraftGroup("affixes", affixes, errors, false);
+        validateDraftGroup("rarities", rarities, errors, false);
         validateDraftGroup("sets", sets, errors, false);
         validateDraftGroup("classes", classes, errors, false);
         validateDraftGroup("skills", skills, errors, false);
@@ -71,9 +73,9 @@ public final class RpgDraftValidator {
         validateDraftGroup("crafting-stations", craftingStations, errors, false);
 
         // Cross-references validation: Items & Weapons & Equipments -> Affix & Set references
-        for (JsonObject item : items.values()) {
-            validateItemReferences(item, affixes, sets, errors);
-        }
+        for (JsonObject item : items.values()) validateItemReferences(item, affixes, sets, rarities, errors);
+        for (JsonObject weapon : weapons.values()) validateItemReferences(weapon, affixes, sets, rarities, errors);
+        for (JsonObject equipment : equipments.values()) validateItemReferences(equipment, affixes, sets, rarities, errors);
 
         // Classes -> Skills references
         for (JsonObject classObj : classes.values()) {
@@ -198,7 +200,9 @@ public final class RpgDraftValidator {
         }
     }
 
-    private static void validateItemReferences(JsonObject item, Map<String, JsonObject> affixes, Map<String, JsonObject> sets, List<String> errors) {
+    private static void validateItemReferences(JsonObject item, Map<String, JsonObject> affixes,
+                                               Map<String, JsonObject> sets, Map<String, JsonObject> rarities,
+                                               List<String> errors) {
         String key = item.has("key") ? item.get("key").getAsString() : "unknown";
         if (item.has("set_id") && !item.get("set_id").isJsonNull()) {
             String setId = item.get("set_id").getAsString().toLowerCase();
@@ -212,6 +216,12 @@ public final class RpgDraftValidator {
                 if (!affixes.containsKey(affixKey)) {
                     errors.add("物品 [" + key + "] 引用不存在的詞綴：" + affixKey);
                 }
+            }
+        }
+        if (item.has("rarity") && !item.get("rarity").isJsonNull()) {
+            String rarity = item.get("rarity").getAsString().toLowerCase();
+            if (!rarity.isBlank() && !rarities.containsKey(rarity)) {
+                errors.add("物品 [" + key + "] 引用不存在的稀有度：" + rarity);
             }
         }
     }

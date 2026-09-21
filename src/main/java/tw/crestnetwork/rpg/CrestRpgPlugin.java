@@ -81,6 +81,7 @@ import tw.crestnetwork.rpg.editor.SetEditorMenu;
 import tw.crestnetwork.rpg.editor.SkillEditorMenu;
 import tw.crestnetwork.rpg.editor.SkillTreeEditorMenu;
 import tw.crestnetwork.rpg.editor.WeaponEditorMenu;
+import tw.crestnetwork.rpg.editor.UniversalDraftEditorMenu;
 import tw.crestnetwork.rpg.editor.NpcEditorMenu;
 import tw.crestnetwork.rpg.npc.RpgNpcEngine;
 import tw.crestnetwork.rpg.party.RpgPartyManager;
@@ -204,7 +205,8 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
                 new MonsterEditorMenu(this, editorSessionManager),
                 new DropTableEditorMenu(this, editorSessionManager),
                 new CraftingStationEditorMenu(this, editorSessionManager),
-                new NpcEditorMenu(this, editorSessionManager))) {
+                new NpcEditorMenu(this, editorSessionManager),
+                new UniversalDraftEditorMenu(this, editorSessionManager))) {
             Bukkit.getPluginManager().registerEvents(listener, this);
         }
         npcEngine = new RpgNpcEngine(this);

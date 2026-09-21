@@ -32,6 +32,7 @@ public final class RpgEditorMenu implements Listener {
         inv.setItem(13, createIcon(Material.EMERALD, "寶石 (Gems)", List.of("編輯寶石與插槽屬性", "當前草稿數量：" + sessionManager.getDraftManager().getDrafts("gems").size())));
         inv.setItem(14, createIcon(Material.ENCHANTED_BOOK, "詞綴 (Affixes)", List.of("編輯隨機詞綴池與屬性範圍", "當前草稿數量：" + sessionManager.getDraftManager().getDrafts("affixes").size())));
         inv.setItem(15, createIcon(Material.GOLD_BLOCK, "套裝 (Sets)", List.of("編輯裝備套裝件數效果", "當前草稿數量：" + sessionManager.getDraftManager().getDrafts("sets").size())));
+        inv.setItem(16, createIcon(Material.NETHER_STAR, "稀有度 (Rarities)", List.of("編輯名稱、顏色與抽選權重", "當前草稿數量：" + sessionManager.getDraftManager().getDrafts("rarities").size())));
 
         inv.setItem(19, createIcon(Material.ARMOR_STAND, "職業 (Classes)", List.of("編輯 RPG 職業與基礎屬性", "當前草稿數量：" + sessionManager.getDraftManager().getDrafts("classes").size())));
         inv.setItem(20, createIcon(Material.BLAZE_POWDER, "技能 (Skills)", List.of("編輯觸發器、條件與效果", "當前草稿數量：" + sessionManager.getDraftManager().getDrafts("skills").size())));
@@ -73,6 +74,7 @@ public final class RpgEditorMenu implements Listener {
             case 13 -> new GemEditorMenu(plugin, sessionManager).open(player);
             case 14 -> new AffixEditorMenu(plugin, sessionManager).open(player);
             case 15 -> new SetEditorMenu(plugin, sessionManager).open(player);
+            case 16 -> new UniversalDraftEditorMenu(plugin, sessionManager).openList(player, "rarities");
             case 19 -> new ClassEditorMenu(plugin, sessionManager).open(player);
             case 20 -> new SkillEditorMenu(plugin, sessionManager).open(player);
             case 21 -> new SkillTreeEditorMenu(plugin, sessionManager).open(player);
