@@ -42,7 +42,7 @@ final class RpgManifestParser {
                 double chance = requiredDouble(drop, "chance");
                 int min = requiredInt(drop, "min");
                 int max = requiredInt(drop, "max");
-                if (!NAMESPACED_KEY.matcher(itemKey).matches()) throw new IllegalArgumentException("物品 ID 格式錯誤：" + itemKey);
+                if (!NAMESPACED_KEY.matcher(itemKey).matches() && !KEY.matcher(itemKey).matches()) throw new IllegalArgumentException("物品 ID 格式錯誤：" + itemKey);
                 if (chance < 0 || chance > 1 || min < 0 || max < min || max > 999) {
                     throw new IllegalArgumentException("掉落物設定錯誤：" + itemKey);
                 }
@@ -51,6 +51,9 @@ final class RpgManifestParser {
 
             double maxHealth = requiredDouble(monster, "max_health");
             double damage = requiredDouble(monster, "damage");
+            List<RpgMonsterDefinition.EquipmentDefinition> equipment = new ArrayList<>();
+            JsonArray equipmentArray = monster.has("equipment") && monster.get("equipment").isJsonArray() ? monster.getAsJsonArray("equipment") : new JsonArray();
+            for (JsonElement equipmentElement : equipmentArray) { JsonObject equipped = equipmentElement.getAsJsonObject(); String itemKey = requiredString(equipped,"item_key").toLowerCase(); double chance = equipped.has("chance") ? requiredDouble(equipped,"chance") : 1; if(chance<0||chance>1)throw new IllegalArgumentException("怪物裝備機率錯誤："+itemKey); equipment.add(new RpgMonsterDefinition.EquipmentDefinition(requiredString(equipped,"slot").toLowerCase(),itemKey,chance)); }
             int level = requiredInt(monster, "level");
             if (revisionId < 1 || version < 1 || level < 1 || maxHealth <= 0 || damage < 0) {
                 throw new IllegalArgumentException("怪物數值錯誤：" + key);
@@ -65,6 +68,11 @@ final class RpgManifestParser {
                     level,
                     maxHealth,
                     damage,
+                    monster.has("movement_speed") ? requiredDouble(monster,"movement_speed") : 0.23,
+                    monster.has("follow_range") ? requiredDouble(monster,"follow_range") : 32,
+                    monster.has("armor") ? requiredDouble(monster,"armor") : 0,
+                    monster.has("knockback_resistance") ? requiredDouble(monster,"knockback_resistance") : 0,
+                    List.copyOf(equipment),
                     List.copyOf(drops),
                     optionalString(monster, "texture_url"),
                     optionalString(monster, "model_url"),

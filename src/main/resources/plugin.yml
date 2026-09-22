@@ -1,5 +1,5 @@
 name: CrestRPG
-version: 2.6.0
+version: 2.7.0
 main: tw.crestnetwork.rpg.CrestRpgPlugin
 api-version: '26.2'
 author: Crest Network

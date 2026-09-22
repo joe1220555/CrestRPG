@@ -25,6 +25,10 @@ public class SkillsGUI {
     }
 
     public void openGUI(Player player) {
+        plugin.openPlayerCenter(player);
+    }
+
+    public void openStatsGUI(Player player) {
         PlayerProfile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
         if (profile == null) {
             player.sendMessage("§c無法加載您的屬性存檔！");

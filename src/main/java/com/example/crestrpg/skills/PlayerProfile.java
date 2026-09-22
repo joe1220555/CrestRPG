@@ -26,6 +26,7 @@ public class PlayerProfile {
     private int characterLevel = 1;
     private double characterXp = 0;
     private String classId = "adventurer";
+    private boolean classSelected;
     private int skillPoints = 1;
     private final Set<String> unlockedSkillNodes = new HashSet<>();
     private final Map<String, Integer> classSkillLevels = new HashMap<>();
@@ -98,6 +99,8 @@ public class PlayerProfile {
     public void setClassId(String classId) {
         this.classId = classId == null || classId.isBlank() ? "adventurer" : classId.toLowerCase(java.util.Locale.ROOT);
     }
+    public boolean isClassSelected() { return classSelected; }
+    public void setClassSelected(boolean classSelected) { this.classSelected = classSelected; }
 
     public int getSkillPoints() { return skillPoints; }
     public void setSkillPoints(int skillPoints) { this.skillPoints = Math.max(0, skillPoints); }

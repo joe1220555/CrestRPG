@@ -55,6 +55,7 @@ public class RPGDatabase {
                                 "unused_ap INT DEFAULT 0," +
                                 "character_level INT DEFAULT 1," +
                                 "class_id VARCHAR(64) DEFAULT 'adventurer'," +
+                                "class_selected BOOLEAN DEFAULT FALSE," +
                                 "skill_points INT DEFAULT 1," +
                                 "character_xp DOUBLE DEFAULT 0" +
                                 ");"
@@ -66,6 +67,9 @@ public class RPGDatabase {
                 } catch (SQLException ignored) {}
                 try {
                     statement.executeUpdate("ALTER TABLE crest_skills ADD COLUMN class_id VARCHAR(64) DEFAULT 'adventurer';");
+                } catch (SQLException ignored) {}
+                try {
+                    statement.executeUpdate("ALTER TABLE crest_skills ADD COLUMN class_selected BOOLEAN DEFAULT FALSE;");
                 } catch (SQLException ignored) {}
                 try {
                     statement.executeUpdate("ALTER TABLE crest_skills ADD COLUMN skill_points INT DEFAULT 1;");
@@ -158,6 +162,7 @@ public class RPGDatabase {
                     profile.setUnusedAp(rs.getInt("unused_ap"));
                     profile.setCharacterLevel(rs.getInt("character_level"));
                     profile.setClassId(rs.getString("class_id"));
+                    profile.setClassSelected(rs.getBoolean("class_selected"));
                     profile.setSkillPoints(rs.getInt("skill_points"));
                     profile.setCharacterXp(rs.getDouble("character_xp"));
                     loadUnlockedSkillNodes(profile);
@@ -184,8 +189,8 @@ public class RPGDatabase {
     private synchronized void createProfile(PlayerProfile profile) {
         String sql = "INSERT INTO crest_skills(uuid, player_name, level_farming, xp_farming, level_mining, xp_mining, " +
                 "level_foraging, xp_foraging, level_combat, xp_combat, level_archery, xp_archery, level_sorcery, xp_sorcery, " +
-                "level_defense, xp_defense, stat_strength, stat_dexterity, stat_intelligence, stat_vitality, unused_ap, character_level, class_id, skill_points, character_xp) " +
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "level_defense, xp_defense, stat_strength, stat_dexterity, stat_intelligence, stat_vitality, unused_ap, character_level, class_id, class_selected, skill_points, character_xp) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
             pstmt.setString(1, profile.getUuid().toString());
             pstmt.setString(2, profile.getPlayerName());
@@ -203,6 +208,7 @@ public class RPGDatabase {
             pstmt.setInt(idx++, profile.getUnusedAp());
             pstmt.setInt(idx++, profile.getCharacterLevel());
             pstmt.setString(idx, profile.getClassId());
+            pstmt.setBoolean(++idx, profile.isClassSelected());
             pstmt.setInt(++idx, profile.getSkillPoints());
             pstmt.setDouble(++idx, profile.getCharacterXp());
 
@@ -219,7 +225,7 @@ public class RPGDatabase {
                 "level_archery = ?, xp_archery = ?, level_sorcery = ?, xp_sorcery = ?, " +
                 "level_defense = ?, xp_defense = ?, " +
                 "stat_strength = ?, stat_dexterity = ?, stat_intelligence = ?, stat_vitality = ?, " +
-                "unused_ap = ?, character_level = ?, class_id = ?, skill_points = ?, character_xp = ? WHERE uuid = ?";
+                "unused_ap = ?, character_level = ?, class_id = ?, class_selected = ?, skill_points = ?, character_xp = ? WHERE uuid = ?";
         try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
             pstmt.setString(1, profile.getPlayerName());
 
@@ -236,6 +242,7 @@ public class RPGDatabase {
             pstmt.setInt(idx++, profile.getUnusedAp());
             pstmt.setInt(idx++, profile.getCharacterLevel());
             pstmt.setString(idx++, profile.getClassId());
+            pstmt.setBoolean(idx++, profile.isClassSelected());
             pstmt.setInt(idx++, profile.getSkillPoints());
             pstmt.setDouble(idx++, profile.getCharacterXp());
             pstmt.setString(idx, profile.getUuid().toString());

@@ -1,7 +1,7 @@
 plugins { java }
 
 group = "tw.crestnetwork"
-version = "2.6.0"
+version = "2.7.0"
 
 repositories {
     maven("https://repo.purpurmc.org/snapshots")

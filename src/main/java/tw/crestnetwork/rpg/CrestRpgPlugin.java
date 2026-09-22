@@ -1,5 +1,8 @@
 package tw.crestnetwork.rpg;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -119,6 +122,8 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
     private SkillTreeMenu skillTreeMenu;
     private RpgCraftingMenu craftingMenu;
     private CrestRpgCommandMenu commandMenu;
+    private PlayerCenterMenu playerCenterMenu;
+    private RolledItemAbilityService rolledItemAbilities;
     private RpgDraftManager draftManager;
     private EditorSessionManager editorSessionManager;
     private RpgEditorMenu editorMenu;
@@ -194,6 +199,10 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(craftingMenu, this);
         commandMenu = new CrestRpgCommandMenu();
         Bukkit.getPluginManager().registerEvents(commandMenu, this);
+        playerCenterMenu = new PlayerCenterMenu(this);
+        Bukkit.getPluginManager().registerEvents(playerCenterMenu, this);
+        rolledItemAbilities = new RolledItemAbilityService(this);
+        Bukkit.getPluginManager().registerEvents(rolledItemAbilities, this);
         draftManager = new RpgDraftManager(this);
         editorSessionManager = new EditorSessionManager(this, draftManager);
         editorMenu = new RpgEditorMenu(this, editorSessionManager);
@@ -254,6 +263,24 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
     public boolean isVaultEnabled() { return VaultEconomyBridge.isAvailable(); }
     public RpgNpcEngine getNpcEngine() { return npcEngine; }
     public RpgDraftManager getDraftManager() { return draftManager; }
+    public void openPlayerCenter(Player player) { playerCenterMenu.open(player); }
+    RpgEngineRegistry registry() { return engineRegistry.get(); }
+    Map<String, RpgWeaponDefinition> weaponDefinitions() { return weaponDefinitions.get(); }
+    Map<String, RpgEquipmentDefinition> equipmentDefinitions() { return equipmentDefinitions.get(); }
+    Map<String, RpgItemDefinition> itemDefinitions() { return itemDefinitions.get(); }
+    public int applyEditorDrafts() {
+        Map<String,RpgWeaponDefinition> weapons=new LinkedHashMap<>();
+        for(Map.Entry<String,JsonObject> entry:draftManager.getDrafts("weapons").entrySet()){JsonObject v=entry.getValue();String k=entry.getKey();weapons.put(k,new RpgWeaponDefinition(1,1,k,jt(v,"name",k),jt(v,"base_item","minecraft:diamond_sword"),jn(v,"oraxen_id"),jt(v,"rarity","common"),ji(v,"level",1),jd(v,"attack_damage",1),jd(v,"attack_speed",1.6),jd(v,"critical_chance",0),v.has("max_durability")?ji(v,"max_durability",0):null,jn(v,"tool_ability"),v.has("ability_unlock_level")?ji(v,"ability_unlock_level",1):null,ji(v,"ability_max_blocks",32),ji(v,"ability_radius",1),ji(v,"ability_cooldown_seconds",3),js(v,"lore"),null,null,jb(v,"enabled",true)));}
+        Map<String,RpgEquipmentDefinition> equipments=new LinkedHashMap<>();
+        for(Map.Entry<String,JsonObject> entry:draftManager.getDrafts("equipments").entrySet()){JsonObject v=entry.getValue();String k=entry.getKey();equipments.put(k,new RpgEquipmentDefinition(1,1,k,jt(v,"name",k),jt(v,"base_item","minecraft:iron_chestplate"),jn(v,"oraxen_id"),jt(v,"rarity","common"),ji(v,"level",1),jt(v,"equipment_slot","chest"),jd(v,"armor",0),jd(v,"armor_toughness",0),jd(v,"knockback_resistance",0),jd(v,"health_bonus",0),js(v,"lore"),null,null,jb(v,"enabled",true)));}
+        Map<String,RpgItemDefinition> items=new LinkedHashMap<>();
+        for(Map.Entry<String,JsonObject> entry:draftManager.getDrafts("items").entrySet()){JsonObject v=entry.getValue();String k=entry.getKey();items.put(k,new RpgItemDefinition(1,1,k,jt(v,"name",k),jt(v,"base_item","minecraft:paper"),jn(v,"oraxen_id"),jt(v,"rarity","common"),ji(v,"level",1),ji(v,"max_stack_size",64),js(v,"lore"),null,null,jb(v,"enabled",true)));}
+        Map<String,RpgMonsterDefinition> monsters=new LinkedHashMap<>();
+        for(Map.Entry<String,JsonObject> entry:draftManager.getDrafts("monsters").entrySet()){JsonObject v=entry.getValue();String k=entry.getKey();List<RpgMonsterDefinition.DropDefinition> drops=new ArrayList<>();if(v.has("drops")&&v.get("drops").isJsonArray())v.getAsJsonArray("drops").forEach(e->{JsonObject d=e.getAsJsonObject();drops.add(new RpgMonsterDefinition.DropDefinition(jt(d,"item_key","minecraft:rotten_flesh"),jd(d,"chance",1),ji(d,"min",1),ji(d,"max",1)));});List<RpgMonsterDefinition.EquipmentDefinition> gear=new ArrayList<>();if(v.has("equipment")&&v.get("equipment").isJsonArray())v.getAsJsonArray("equipment").forEach(e->{JsonObject g=e.getAsJsonObject();gear.add(new RpgMonsterDefinition.EquipmentDefinition(jt(g,"slot","main_hand"),jt(g,"item_key","minecraft:iron_sword"),jd(g,"chance",1)));});monsters.put(k,new RpgMonsterDefinition(1,1,k,jt(v,"name",k),jt(v,"entity_type","minecraft:zombie"),jn(v,"model_engine_id"),ji(v,"level",1),jd(v,"max_health",20),jd(v,"damage",2),jd(v,"movement_speed",.23),jd(v,"follow_range",32),jd(v,"armor",0),jd(v,"knockback_resistance",0),List.copyOf(gear),List.copyOf(drops),null,null,jb(v,"enabled",true)));}
+        List<RpgGameplayDefinition> gameplay=new ArrayList<>();addDraftSection(gameplay,"classes");addDraftSection(gameplay,"skills");addDraftSection(gameplay,"skill-trees");addDraftSection(gameplay,"crafting-stations");addDraftSection(gameplay,"drop-tables");RpgEngineRegistry next=RpgEngineRegistry.from(gameplay);weaponDefinitions.set(Map.copyOf(weapons));equipmentDefinitions.set(Map.copyOf(equipments));itemDefinitions.set(Map.copyOf(items));definitions.set(Map.copyOf(monsters));engineRegistry.set(next);Bukkit.getScheduler().runTask(this,()->{refreshPlayerProgressionRules();if(npcEngine!=null)npcEngine.loadNpcsFromDrafts(draftManager);});return weapons.size()+equipments.size()+items.size()+monsters.size()+next.classes().size()+next.skills().size();
+    }
+    private void addDraftSection(List<RpgGameplayDefinition> out,String kind){JsonArray values=new JsonArray();draftManager.getDrafts(kind).values().forEach(v->values.add(v.deepCopy()));JsonObject data=new JsonObject();data.add("definitions",values);out.add(new RpgGameplayDefinition(1,1,kind,kind,data,true));}
+    private static String jt(JsonObject v,String k,String f){return v.has(k)&&!v.get(k).isJsonNull()?v.get(k).getAsString():f;}private static String jn(JsonObject v,String k){String s=jt(v,k,"");return s.isBlank()?null:s;}private static int ji(JsonObject v,String k,int f){return v.has(k)?v.get(k).getAsInt():f;}private static double jd(JsonObject v,String k,double f){return v.has(k)?v.get(k).getAsDouble():f;}private static boolean jb(JsonObject v,String k,boolean f){return v.has(k)?v.get(k).getAsBoolean():f;}private static List<String> js(JsonObject v,String k){if(!v.has(k)||!v.get(k).isJsonArray())return List.of();List<String> r=new ArrayList<>();v.getAsJsonArray(k).forEach(e->r.add(e.getAsString()));return List.copyOf(r);}
     public RpgPartyManager getPartyManager() { return partyManager; }
     public RpgDungeonEngine getDungeonEngine() { return dungeonEngine; }
     public RpgTitleManager getTitleManager() { return titleManager; }
@@ -449,6 +476,7 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
                 return true;
             }
             profile.setClassId(key);
+            profile.setClassSelected(true);
             profile.getSkillBar().entrySet().removeIf(entry -> !selected.skills().contains(entry.getValue()));
             profile.setCurrentMana(Math.min(profile.getCurrentMana(), profile.getMaxMana()));
             Bukkit.getScheduler().runTaskAsynchronously(this, () -> legacyDatabase.saveProfile(profile));
@@ -664,7 +692,7 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
         meta.getPersistentDataContainer().set(weaponKey, PersistentDataType.STRING, definition.key());
         meta.getPersistentDataContainer().set(contentKey, PersistentDataType.STRING, definition.key());
         item.setItemMeta(meta);
-        return advancedItems.decorate(item, definition.key());
+        return rolledItemAbilities.roll(advancedItems.decorate(item, definition.key()), definition.key(), definition.level());
     }
 
     private ItemStack createEquipment(RpgEquipmentDefinition definition) {
@@ -685,7 +713,7 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
         addAttribute(meta, Attribute.MAX_HEALTH, definition.healthBonus(), definition.key() + "_health", slot);
         meta.getPersistentDataContainer().set(contentKey, PersistentDataType.STRING, definition.key());
         item.setItemMeta(meta);
-        return advancedItems.decorate(item, definition.key());
+        return rolledItemAbilities.roll(advancedItems.decorate(item, definition.key()), definition.key(), definition.level());
     }
 
     private ItemStack createItem(RpgItemDefinition definition) {
@@ -850,6 +878,15 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
         }
         maxHealth.setBaseValue(definition.maxHealth());
         living.setHealth(definition.maxHealth());
+        setMobAttribute(living, Attribute.MOVEMENT_SPEED, definition.movementSpeed());
+        setMobAttribute(living, Attribute.FOLLOW_RANGE, definition.followRange());
+        setMobAttribute(living, Attribute.ARMOR, definition.armor());
+        setMobAttribute(living, Attribute.KNOCKBACK_RESISTANCE, definition.knockbackResistance());
+        for (RpgMonsterDefinition.EquipmentDefinition equipped : definition.equipment()) {
+            if (ThreadLocalRandom.current().nextDouble() > equipped.chance()) continue;
+            ItemStack equipmentItem = createGeneratedContent(equipped.itemKey()); if (equipmentItem == null) continue;
+            switch (equipped.slot()) { case "head" -> living.getEquipment().setHelmet(equipmentItem); case "chest" -> living.getEquipment().setChestplate(equipmentItem); case "legs" -> living.getEquipment().setLeggings(equipmentItem); case "feet" -> living.getEquipment().setBoots(equipmentItem); case "off_hand" -> living.getEquipment().setItemInOffHand(equipmentItem); default -> living.getEquipment().setItemInMainHand(equipmentItem); }
+        }
         living.customName(Component.text("[Lv." + definition.level() + "] " + definition.name(), NamedTextColor.GOLD));
         living.setCustomNameVisible(true);
         living.getPersistentDataContainer().set(monsterKey, PersistentDataType.STRING, definition.key());
@@ -857,6 +894,8 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
         new ModelEngineBridge(this).apply(living, definition.modelEngineId());
         return living;
     }
+
+    private static void setMobAttribute(LivingEntity living, Attribute attribute, double value) { AttributeInstance instance=living.getAttribute(attribute); if(instance!=null&&Double.isFinite(value)&&value>=0)instance.setBaseValue(value); }
 
     @EventHandler(ignoreCancelled = true)
     public void onDamage(EntityDamageByEntityEvent event) {
@@ -996,7 +1035,7 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
         return true;
     }
 
-    private int playerLevel(Player player) {
+    int playerLevel(Player player) {
         PlayerProfile profile = profileManager == null ? null : profileManager.getProfile(player.getUniqueId());
         return profile == null ? 1 : profile.getCharacterLevel();
     }
@@ -1053,12 +1092,12 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
                 if (random.nextDouble() > drop.chance()) continue;
                 int amount = drop.min() == drop.max() ? drop.min() : random.nextInt(drop.min(), drop.max() + 1);
                 if (amount <= 0) continue;
-                Material material = Material.matchMaterial(drop.itemKey());
-                if (material == null || !material.isItem() || material.isAir()) {
+                ItemStack generated = createGeneratedContent(drop.itemKey());
+                if (generated == null) {
                     getLogger().warning("忽略無效掉落物：" + drop.itemKey() + "（怪物 " + definition.key() + "）");
                     continue;
                 }
-                event.getDrops().add(new ItemStack(material, amount));
+                generated.setAmount(Math.min(generated.getMaxStackSize(), amount)); event.getDrops().add(generated);
             }
         }
         String customSource = definition == null ? null : definition.key();

@@ -23,7 +23,7 @@ Crest Network 的 Purpur 26.2／Java 25 獨立 RPG 引擎。它從網站同步�
 ./gradlew clean build
 ```
 
-產物：`build/libs/CrestRPG-2.6.0.jar`
+產物：`build/libs/CrestRPG-2.7.0.jar`
 
 ## 安裝
 

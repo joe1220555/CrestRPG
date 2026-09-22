@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.bukkit.plugin.Plugin;
+import tw.crestnetwork.rpg.CrestRpgPlugin;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -229,6 +230,12 @@ public final class EmbeddedWebEditorServer {
             RpgDraftValidator.ValidationResult result = RpgDraftValidator.validate(drafts);
             sendJson(exchange, result.isValid() ? 200 : 422,
                     Map.of("valid", result.isValid(), "errors", result.getErrors()));
+            return;
+        }
+        if (path.equals("/api/apply") && method.equals("POST")) {
+            if (!(plugin instanceof CrestRpgPlugin crestRpg)) throw new RequestException(503, "插件熱載入不可用");
+            try { sendJson(exchange, 200, Map.of("applied", true, "count", crestRpg.applyEditorDrafts())); }
+            catch (RuntimeException exception) { throw new RequestException(422, "草稿已儲存，但無法套用：" + exception.getMessage()); }
             return;
         }
         if (path.equals("/api/token") && method.equals("PUT")) {
