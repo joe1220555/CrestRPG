@@ -7,7 +7,7 @@ Crest Network 的 Purpur 26.2／Java 25 獨立 RPG 引擎。它從網站同步�
 - 自訂怪物、武器、裝備、物品與掉落表
 - 詞綴、寶石、插槽、稀有度、品質與隨機生成
 - 套裝、鑑定、強化、鑲嵌與分解
-- 自訂製作站、任務、隊伍、地城、稱號與成就
+- 自訂製作站、任務、隊伍、工會、地城、稱號與成就
 - 職業、技能樹、技能快捷列、技能等級與法力
 - 遊戲內 RPG 內容編輯器與網站 manifest 同步
 - Oraxen、ModelEngine、Vault 與 PlaceholderAPI 整合
@@ -23,7 +23,7 @@ Crest Network 的 Purpur 26.2／Java 25 獨立 RPG 引擎。它從網站同步�
 ./gradlew clean build
 ```
 
-產物：`build/libs/CrestRPG-2.7.0.jar`
+產物：`build/libs/CrestRPG-2.8.0.jar`
 
 ## 安裝
 

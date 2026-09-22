@@ -117,7 +117,7 @@ public final class AdvancedItemService {
         });
         for (String key : state.gems()) {
             RpgEngineRegistry.GemDefinition gem = snapshot.gems().get(key);
-            if (gem != null) result.merge(gem.stat(), gem.value(), Double::sum);
+            if (gem != null) gem.stats().forEach((stat,value)->result.merge(stat,value,Double::sum));
         }
         double upgradeMultiplier = 1.0 + state.upgradeLevel() * 0.05;
         result.replaceAll((key, value) -> Math.round(value * upgradeMultiplier * 100.0) / 100.0);
@@ -196,7 +196,7 @@ public final class AdvancedItemService {
         });
         for (String key : state.gems()) {
             RpgEngineRegistry.GemDefinition gem = snapshot.gems().get(key);
-            if (gem != null) result.merge(gem.stat(), gem.value(), Double::sum);
+            if (gem != null) gem.stats().forEach((stat,value)->result.merge(stat,value,Double::sum));
         }
         double multiplier = 1.0 + state.upgradeLevel() * 0.05;
         result.replaceAll((key, value) -> Math.round(value * multiplier * 100.0) / 100.0);

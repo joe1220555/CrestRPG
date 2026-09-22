@@ -1,5 +1,5 @@
 name: CrestRPG
-version: 2.7.0
+version: 2.8.0
 main: tw.crestnetwork.rpg.CrestRpgPlugin
 api-version: '26.2'
 author: Crest Network
@@ -54,6 +54,11 @@ commands:
     description: CrestRPG 稱號與成就管理
     aliases: [title, rpgtitle]
     usage: /titles
+    permission: crestrpg.use
+  guild:
+    description: CrestRPG 工會建立、邀請、管理與捐獻
+    aliases: [g, guilds, rpgguild]
+    usage: /guild [create|invite|accept|leave|disband|promote|demote|donate|announcement|gui]
     permission: crestrpg.use
 permissions:
   crestrpg.use:

@@ -33,7 +33,7 @@ public final class EmbeddedWebEditorServer {
     private static final int MAX_REQUEST_BYTES = 1_048_576;
     private static final Set<String> KINDS = Set.of(
             "items", "weapons", "equipments", "gems", "affixes", "rarities", "sets",
-            "classes", "skills", "skill-trees", "quests", "monsters", "drop-tables", "crafting-stations", "npcs"
+            "classes", "skills", "skill-trees", "quests", "monsters", "drop-tables", "crafting-stations", "npcs", "gui-layouts", "guild-settings"
     );
     private static final Map<String, String> ASSETS = Map.of(
             "/", "web-editor/index.html",
@@ -366,7 +366,7 @@ public final class EmbeddedWebEditorServer {
             }
         }
     }
-    private static List<String> orderedKinds() { return List.of("items", "weapons", "equipments", "gems", "affixes", "rarities", "sets", "classes", "skills", "skill-trees", "quests", "monsters", "drop-tables", "crafting-stations", "npcs"); }
+    private static List<String> orderedKinds() { return List.of("gems", "items", "equipments", "weapons", "affixes", "rarities", "sets", "classes", "skills", "skill-trees", "quests", "monsters", "drop-tables", "crafting-stations", "npcs", "gui-layouts", "guild-settings"); }
     private static boolean isLoopback(String host) { return host.equals("127.0.0.1") || host.equals("localhost") || host.equals("::1"); }
 
     private static void addSecurityHeaders(HttpExchange exchange) {

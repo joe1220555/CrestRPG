@@ -32,4 +32,9 @@ public final class VaultEconomyBridge {
             econ.depositPlayer(player, amount);
         }
     }
+
+    public static boolean withdraw(Player player, double amount) {
+        if (amount < 0 || !isAvailable() || !(economyProvider instanceof net.milkbowl.vault.economy.Economy econ)) return false;
+        return econ.withdrawPlayer(player, amount).transactionSuccess();
+    }
 }

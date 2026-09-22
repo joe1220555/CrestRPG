@@ -135,8 +135,13 @@ public final class RpgEngineRegistry {
         Map<String, GemDefinition> result = new LinkedHashMap<>();
         for (JsonObject value : objects(root, "gems")) {
             String key = key(value);
-            put(result, key, new GemDefinition(key, required(value, "stat"),
-                    number(value, "value", 0, -1_000_000, 1_000_000), strings(value, "allowed_slots"),
+            Map<String, Double> stats = new LinkedHashMap<>();
+            if (value.has("stats") && value.get("stats").isJsonArray()) for (JsonObject stat : objects(value, "stats")) {
+                String statKey = required(stat, "stat").toLowerCase();
+                stats.merge(statKey, number(stat, "value", 0, -1_000_000, 1_000_000), Double::sum);
+            }
+            if (stats.isEmpty() && value.has("stat")) stats.put(required(value, "stat").toLowerCase(), number(value, "value", 0, -1_000_000, 1_000_000));
+            put(result, key, new GemDefinition(key, Map.copyOf(stats), strings(value, "allowed_slots"),
                     string(value, "material", "minecraft:amethyst_shard").toLowerCase()));
         }
         return result;
@@ -150,7 +155,6 @@ public final class RpgEngineRegistry {
             for (JsonObject bonus : objects(value, "bonuses")) {
                 int pieces = integer(bonus, "pieces", -1, 1, 16);
                 Map<String, Double> stats = numberMap(bonus, "stats");
-                if (stats.isEmpty()) fail("套裝效果不可為空：" + key);
                 if (bonuses.putIfAbsent(pieces, stats) != null) fail("套裝件數效果重複：" + key);
             }
             put(result, key, new SetDefinition(key, string(value, "name", key), Map.copyOf(bonuses)));
@@ -183,7 +187,6 @@ public final class RpgEngineRegistry {
             for (JsonObject effect : effects) {
                 validateEffect(effect, 0);
             }
-            if (effects.isEmpty()) fail("技能效果不可為空：" + key);
             put(result, key, new SkillDefinition(key, string(value, "name", key), trigger,
                     number(value, "mana_cost", 0, 0, 1_000_000), number(value, "cooldown_seconds", 0, 0, 86_400),
                     number(value, "cast_time_seconds", 0, 0, 60), bool(value, "interruptible", true),
@@ -254,7 +257,7 @@ public final class RpgEngineRegistry {
                     ingredients.add(new IngredientDefinition(ingredientKey,
                             integer(ingredient, "amount", 1, 1, 999), bool(ingredient, "content", !ingredientKey.contains(":"))));
                 }
-                if (ingredients.isEmpty()) fail("製作配方材料不可為空：" + recipeKey);
+                if (ingredients.isEmpty()) continue;
                 recipes.add(new RecipeDefinition(recipeKey, required(recipe, "output").toLowerCase(),
                         integer(recipe, "amount", 1, 1, 99), integer(recipe, "required_level", 1, 1, 1000),
                         string(recipe, "permission", ""), List.copyOf(ingredients)));
@@ -278,7 +281,6 @@ public final class RpgEngineRegistry {
                 totalWeight += weight;
                 entries.add(new DropEntry(content, weight, min, max, bool(entry, "content", !content.contains(":"))));
             }
-            if (entries.isEmpty()) fail("掉落表不可為空：" + key);
             put(result, key, new DropTableDefinition(key, integer(value, "rolls", 1, 1, 100),
                     strings(value, "sources"), List.copyOf(entries), totalWeight));
         }
@@ -348,7 +350,7 @@ public final class RpgEngineRegistry {
                         int maxUpgrade, String setId, List<String> affixPool, boolean requiresIdentification,
                         double salvageValue, String material, String name, Map<String, Double> baseStats) {}
     record AffixDefinition(String key, String stat, double min, double max, double weight, String name) {}
-    record GemDefinition(String key, String stat, double value, List<String> allowedSlots, String material) {}
+    record GemDefinition(String key, Map<String, Double> stats, List<String> allowedSlots, String material) {}
     record SetDefinition(String key, String name, Map<Integer, Map<String, Double>> bonuses) {}
     record ClassDefinition(String key, String name, double baseMana, List<String> skills, Map<String, Double> baseStats) {}
     record SkillDefinition(String key, String name, String trigger, double manaCost, double cooldownSeconds,

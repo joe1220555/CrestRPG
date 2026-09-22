@@ -49,7 +49,7 @@ public final class RpgDraftManager {
             }
         }
         loadAllDrafts();
-        if (plugin != null) importBundledDefaultsOnce();
+        if (plugin != null) { importBundledDefaultsOnce(); ensureGuiDefaults(); }
     }
 
     public synchronized void loadAllDrafts() {
@@ -57,7 +57,7 @@ public final class RpgDraftManager {
         String[] kinds = {
                 "items", "weapons", "equipments", "gems", "affixes", "rarities", "sets",
                 "classes", "skills", "skill-trees", "quests", "monsters", "drop-tables", "crafting-stations",
-                "npcs"
+                "npcs", "gui-layouts", "guild-settings"
         };
         for (String kind : kinds) {
             Map<String, JsonObject> map = new LinkedHashMap<>();
@@ -84,6 +84,28 @@ public final class RpgDraftManager {
             draftsByKind.put(kind, map);
         }
     }
+
+    private synchronized void ensureGuiDefaults() {
+        Map<String, JsonObject> layouts = draftsByKind.computeIfAbsent("gui-layouts", ignored -> new LinkedHashMap<>());
+        Map<String, JsonObject> settings = draftsByKind.computeIfAbsent("guild-settings", ignored -> new LinkedHashMap<>());
+        if (settings.isEmpty()) { JsonObject value=new JsonObject();value.addProperty("key","main");value.addProperty("name","工會系統設定");value.addProperty("creation_cost",0);value.addProperty("max_members",50);value.addProperty("invite_expiry_minutes",5);value.addProperty("donation_xp_ratio",0.1);value.addProperty("enabled",true);settings.put("main",value);persistKind("guild-settings"); }
+        if (!layouts.isEmpty()) { JsonObject center=layouts.get("player_center");if(center!=null&&center.has("buttons")&&center.get("buttons").isJsonArray()){boolean found=false;for(JsonElement element:center.getAsJsonArray("buttons"))if(element.isJsonObject()&&element.getAsJsonObject().has("action")&&element.getAsJsonObject().get("action").getAsString().equals("guild")){found=true;break;}if(!found){JsonObject button=new JsonObject();button.addProperty("slot",33);button.addProperty("material","minecraft:bell");button.addProperty("name","工會中心");JsonArray lore=new JsonArray();lore.add("查看工會、成員、資金與公告");button.add("lore",lore);button.addProperty("action","guild");button.addProperty("enabled",true);center.getAsJsonArray("buttons").add(button);persistKind("gui-layouts");}}return;}
+        layouts.put("player_center", gui("player_center", "玩家中心", "CrestRPG 玩家中心", 6, new Object[][]{
+                {13,"minecraft:player_head","{player}","角色等級：{level}|目前職業：{class}","profile"},{20,"minecraft:armor_stand","轉換職業","查看可選職業並進行轉換","classes"},{22,"minecraft:nether_star","技能與屬性","查看屬性與分配 AP","stats"},{24,"minecraft:chest","可使用的內容","查看可使用的武器、裝備與物品","content"},{31,"minecraft:blaze_powder","技能快捷列","設定技能快捷列","skill_bar"},{32,"minecraft:oak_sapling","職業技能樹","查看職業技能樹","skill_tree"},{33,"minecraft:bell","工會中心","查看工會、成員、資金與公告","guild"},{49,"minecraft:barrier","關閉","關閉目前介面","close"}}));
+        layouts.put("class_selection", gui("class_selection","首次職業選擇","請先選擇職業",6,new Object[0][]));
+        layouts.put("class_change", gui("class_change","轉職介面","轉換職業",6,new Object[0][]));
+        layouts.put("usable_content", gui("usable_content","可用內容","可使用的 RPG 內容",6,new Object[0][]));
+        layouts.put("skills", gui("skills","技能與屬性","技能與屬性",6,new Object[0][]));
+        layouts.put("skill_tree", gui("skill_tree","技能樹","職業技能樹",6,new Object[0][]));
+        layouts.put("crafting", gui("crafting","製作站","RPG 製作站",6,new Object[0][]));
+        layouts.put("commands", gui("commands","指令選單","CrestRPG 指令選單",6,new Object[0][]));
+        layouts.put("quests", gui("quests","任務介面","任務中心",6,new Object[0][]));
+        layouts.put("party", gui("party","隊伍介面","隊伍管理",6,new Object[0][]));
+        layouts.put("guild", gui("guild","工會介面（預留）","工會中心",6,new Object[0][]));
+        persistKind("gui-layouts");
+    }
+
+    private static JsonObject gui(String key,String name,String title,int rows,Object[][] definitions){JsonObject root=new JsonObject();root.addProperty("key",key);root.addProperty("name",name);root.addProperty("title",title);root.addProperty("rows",rows);root.addProperty("enabled",true);JsonArray buttons=new JsonArray();for(Object[] definition:definitions){JsonObject button=new JsonObject();button.addProperty("slot",(Integer)definition[0]);button.addProperty("material",(String)definition[1]);button.addProperty("name",(String)definition[2]);JsonArray lore=new JsonArray();for(String line:((String)definition[3]).split("\\|"))lore.add(line);button.add("lore",lore);button.addProperty("action",(String)definition[4]);button.addProperty("enabled",true);buttons.add(button);}root.add("buttons",buttons);return root;}
 
     public synchronized Map<String, JsonObject> getDrafts(String kind) {
         return new LinkedHashMap<>(draftsByKind.getOrDefault(kind, Map.of()));

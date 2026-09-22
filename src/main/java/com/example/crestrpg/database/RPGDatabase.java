@@ -86,6 +86,9 @@ public class RPGDatabase {
                 );
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS crest_class_skill_progress (uuid VARCHAR(36) NOT NULL, skill_key VARCHAR(64) NOT NULL, skill_level INT DEFAULT 1, skill_xp DOUBLE DEFAULT 0, PRIMARY KEY (uuid, skill_key));");
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS crest_skill_bar (uuid VARCHAR(36) NOT NULL, bar_slot INT NOT NULL, skill_key VARCHAR(64) NOT NULL, PRIMARY KEY (uuid, bar_slot));");
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS crest_guilds (guild_id VARCHAR(36) PRIMARY KEY, name VARCHAR(32) NOT NULL UNIQUE, tag VARCHAR(8) NOT NULL UNIQUE, owner_uuid VARCHAR(36) NOT NULL, level INT DEFAULT 1, xp DOUBLE DEFAULT 0, balance DOUBLE DEFAULT 0, announcement VARCHAR(512) DEFAULT '', created_at BIGINT NOT NULL);");
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS crest_guild_members (guild_id VARCHAR(36) NOT NULL, uuid VARCHAR(36) PRIMARY KEY, player_name VARCHAR(16) NOT NULL, role VARCHAR(16) DEFAULT 'MEMBER', joined_at BIGINT NOT NULL);");
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS crest_guild_invites (guild_id VARCHAR(36) NOT NULL, uuid VARCHAR(36) NOT NULL, invited_by VARCHAR(36) NOT NULL, expires_at BIGINT NOT NULL, PRIMARY KEY (guild_id, uuid));");
 
                 // Table 2: Active Quests
                 statement.executeUpdate(
@@ -132,6 +135,8 @@ public class RPGDatabase {
         }
         return connection;
     }
+
+    public synchronized Connection guildConnection() throws SQLException { return getConnection(); }
 
     public synchronized void close() {
         try {
