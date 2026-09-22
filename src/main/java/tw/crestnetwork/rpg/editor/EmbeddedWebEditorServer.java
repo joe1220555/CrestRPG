@@ -166,9 +166,13 @@ public final class EmbeddedWebEditorServer {
             try {
                 File file = minecraftAssets.icon(query.getOrDefault("id", ""));
                 sendFile(exchange, file, "image/png", null);
+            } catch (IllegalArgumentException exception) {
+                throw new RequestException(404, exception.getMessage());
             } catch (InterruptedException exception) {
                 Thread.currentThread().interrupt();
                 throw new RequestException(503, "Minecraft 圖示下載已中斷");
+            } catch (IOException exception) {
+                throw new RequestException(502, "Minecraft 圖示暫時無法使用：" + exception.getMessage());
             }
             return;
         }
