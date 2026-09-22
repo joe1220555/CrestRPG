@@ -82,7 +82,8 @@ import tw.crestnetwork.rpg.editor.SkillEditorMenu;
 import tw.crestnetwork.rpg.editor.SkillTreeEditorMenu;
 import tw.crestnetwork.rpg.editor.WeaponEditorMenu;
 import tw.crestnetwork.rpg.editor.UniversalDraftEditorMenu;
-import tw.crestnetwork.rpg.editor.NpcEditorMenu;
+import tw.crestnetwork.rpg.editor.VanillaMaterialPickerMenu;
+import tw.crestnetwork.rpg.editor.EmbeddedWebEditorServer;
 import tw.crestnetwork.rpg.npc.RpgNpcEngine;
 import tw.crestnetwork.rpg.party.RpgPartyManager;
 import tw.crestnetwork.rpg.party.PartyCommand;
@@ -117,9 +118,11 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
     private SkillBarMenu skillBarMenu;
     private SkillTreeMenu skillTreeMenu;
     private RpgCraftingMenu craftingMenu;
+    private CrestRpgCommandMenu commandMenu;
     private RpgDraftManager draftManager;
     private EditorSessionManager editorSessionManager;
     private RpgEditorMenu editorMenu;
+    private EmbeddedWebEditorServer webEditorServer;
     private RpgNpcEngine npcEngine;
     private RpgPartyManager partyManager;
     private RpgDungeonEngine dungeonEngine;
@@ -158,6 +161,7 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        if (webEditorServer != null) webEditorServer.stop();
         if (profileManager != null) profileManager.saveAll();
         if (legacyDatabase != null) legacyDatabase.close();
     }
@@ -188,9 +192,13 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(skillTreeMenu, this);
         craftingMenu = new RpgCraftingMenu(this);
         Bukkit.getPluginManager().registerEvents(craftingMenu, this);
+        commandMenu = new CrestRpgCommandMenu();
+        Bukkit.getPluginManager().registerEvents(commandMenu, this);
         draftManager = new RpgDraftManager(this);
         editorSessionManager = new EditorSessionManager(this, draftManager);
         editorMenu = new RpgEditorMenu(this, editorSessionManager);
+        webEditorServer = new EmbeddedWebEditorServer(this, draftManager);
+        webEditorServer.start();
         for (Listener listener : List.of(
                 editorMenu,
                 new ItemEditorMenu(this, editorSessionManager),
@@ -206,6 +214,7 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
                 new DropTableEditorMenu(this, editorSessionManager),
                 new CraftingStationEditorMenu(this, editorSessionManager),
                 new NpcEditorMenu(this, editorSessionManager),
+                new VanillaMaterialPickerMenu(this, editorSessionManager),
                 new UniversalDraftEditorMenu(this, editorSessionManager))) {
             Bukkit.getPluginManager().registerEvents(listener, this);
         }
@@ -315,7 +324,10 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
             sender.sendMessage(Component.text("你沒有 CrestRPG 管理權限。", NamedTextColor.RED));
             return true;
         }
-        if (args.length == 0) return usage(sender);
+        if (args.length == 0) {
+            if (sender instanceof Player player) commandMenu.open(player); else usage(sender);
+            return true;
+        }
 
         return switch (args[0].toLowerCase(Locale.ROOT)) {
             case "editor" -> {
@@ -323,6 +335,18 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
                     editorMenu.open(player);
                 } else {
                     sender.sendMessage(Component.text("此操作必須由玩家執行。", NamedTextColor.RED));
+                }
+                yield true;
+            }
+            case "web" -> {
+                if (webEditorServer == null || !webEditorServer.isRunning()) {
+                    String reason = webEditorServer == null ? "尚未初始化" : webEditorServer.getStatusMessage();
+                    sender.sendMessage(Component.text("內建網頁編輯器未執行：" + reason + "。修正 config.yml 後請完整重啟伺服器。", NamedTextColor.RED));
+                } else {
+                    String host = getConfig().getString("web-editor.bind-address", "127.0.0.1");
+                    int port = getConfig().getInt("web-editor.port", 8765);
+                    String displayHost = host.equals("0.0.0.0") ? "<伺服器 IP 或網域>" : host;
+                    sender.sendMessage(Component.text("內建網頁編輯器正在執行：http://" + displayHost + ":" + port + "/", NamedTextColor.AQUA));
                 }
                 yield true;
             }
@@ -1105,7 +1129,14 @@ public final class CrestRpgPlugin extends JavaPlugin implements Listener {
     }
 
     private boolean usage(CommandSender sender) {
-        sender.sendMessage(Component.text("用法：/crestrpg reload | editor | list | weapons | equipments | items | spawn <怪物代碼> [玩家] | give <內容代碼> [玩家] | identify | upgrade | socket <寶石代碼> | salvage", NamedTextColor.YELLOW));
+        sender.sendMessage(Component.text("── CrestRPG 管理指令 ──", NamedTextColor.GOLD));
+        sender.sendMessage(Component.text("/crestrpg editor  開啟遊戲內圖形編輯器", NamedTextColor.YELLOW));
+        sender.sendMessage(Component.text("/crestrpg web     查看網頁編輯器狀態", NamedTextColor.YELLOW));
+        sender.sendMessage(Component.text("/crestrpg reload  重新同步 RPG 內容", NamedTextColor.YELLOW));
+        sender.sendMessage(Component.text("/crestrpg items | weapons | equipments | list", NamedTextColor.YELLOW));
+        sender.sendMessage(Component.text("/crestrpg spawn <怪物代碼> [玩家]", NamedTextColor.YELLOW));
+        sender.sendMessage(Component.text("/crestrpg give <內容代碼> [玩家]", NamedTextColor.YELLOW));
+        sender.sendMessage(Component.text("/crestrpg identify | upgrade | socket <寶石代碼> | salvage", NamedTextColor.YELLOW));
         return true;
     }
 }

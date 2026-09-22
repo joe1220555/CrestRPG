@@ -3,6 +3,23 @@ api-token: "CHANGE_ME"
 server-key: "example-server"
 poll-seconds: 15
 
+# 內建網頁編輯器。預設只允許從伺服器本機連線。
+web-editor:
+  enabled: false
+  bind-address: "127.0.0.1"
+  port: 8765
+  # 保持 CHANGE_ME 時，插件會在首次啟動自動產生安全 Token 並寫回此檔案。
+  token: "CHANGE_ME"
+
+resource-pack:
+  # 請依伺服器的 Minecraft 版本調整。
+  pack-format: 55
+  description: "CrestRPG generated resources"
+
+minecraft-assets:
+  # 用於從 Mojang 官方資源索引同步原版材質圖示。
+  version: "26.2"
+
 
 # 以下遊戲規則會在網站發布後由 gameplay manifest 覆蓋；這些值也是首次啟動與離線備援預設值。
 attributes:

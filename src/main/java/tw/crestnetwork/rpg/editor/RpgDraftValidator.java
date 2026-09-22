@@ -48,6 +48,7 @@ public final class RpgDraftValidator {
         Map<String, JsonObject> classes = allDrafts.getOrDefault("classes", Map.of());
         Map<String, JsonObject> skills = allDrafts.getOrDefault("skills", Map.of());
         Map<String, JsonObject> skillTrees = allDrafts.getOrDefault("skill-trees", Map.of());
+        Map<String, JsonObject> quests = allDrafts.getOrDefault("quests", Map.of());
         Map<String, JsonObject> monsters = allDrafts.getOrDefault("monsters", Map.of());
         Map<String, JsonObject> dropTables = allDrafts.getOrDefault("drop-tables", Map.of());
         Map<String, JsonObject> craftingStations = allDrafts.getOrDefault("crafting-stations", Map.of());
@@ -68,6 +69,7 @@ public final class RpgDraftValidator {
         validateDraftGroup("classes", classes, errors, false);
         validateDraftGroup("skills", skills, errors, false);
         validateDraftGroup("skill-trees", skillTrees, errors, false);
+        validateDraftGroup("quests", quests, errors, false);
         validateDraftGroup("monsters", monsters, errors, false);
         validateDraftGroup("drop-tables", dropTables, errors, false);
         validateDraftGroup("crafting-stations", craftingStations, errors, false);

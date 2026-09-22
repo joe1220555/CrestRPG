@@ -69,7 +69,7 @@ public final class UniversalDraftEditorMenu implements Listener {
         player.openInventory(inv);
     }
 
-    private void openDetail(Player player, String kind, String key) {
+    void openDetail(Player player, String kind, String key) {
         JsonObject draft = sessions.getDraftManager().getDraft(kind, key);
         if (draft == null) {
             player.sendMessage(Component.text("[RPG 編輯器] 找不到草稿：" + key, NamedTextColor.RED));
@@ -86,7 +86,10 @@ public final class UniversalDraftEditorMenu implements Listener {
             lore.add("目前：" + value);
             lore.add(field.help());
             lore.add(field.type() == ValueType.BOOLEAN ? "點擊切換" : "點擊後於聊天欄輸入");
-            if (field.type() == ValueType.MATERIAL) lore.add("Shift+左鍵：使用主手物品");
+            if (field.type() == ValueType.MATERIAL) {
+                lore.set(lore.size() - 1, "左鍵：開啟 Minecraft 圖示選擇器");
+                lore.add("Shift+左鍵：使用主手物品");
+            }
             inv.setItem(fieldSlot(i), icon(field.icon(), field.label(), lore));
         }
         inv.setItem(45, icon(Material.SPYGLASS, "預覽資料", previewLore(draft)));
@@ -171,6 +174,10 @@ public final class UniversalDraftEditorMenu implements Listener {
             }
             draft.addProperty(field.key(), material.getKey().toString());
             saveAndReopen(player, holder, draft, "已從主手讀取材質 " + material.getKey());
+            return;
+        }
+        if (field.type() == ValueType.MATERIAL) {
+            new VanillaMaterialPickerMenu(plugin, sessions).open(player, holder.kind(), holder.key(), field.key(), 0);
             return;
         }
         requestInput(player, inputHelp(field), input -> updateField(player, holder, field, input));

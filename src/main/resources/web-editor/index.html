@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CrestRPG 內容編輯器</title>
+  <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+  <section id="login" class="login-shell">
+    <form id="login-form" class="login-card">
+      <div class="brand-mark">C</div>
+      <p class="eyebrow">CREST NETWORK</p>
+      <h1>CrestRPG 管理後台</h1>
+      <p class="muted">這個頁面由 RPG 伺服器內的插件直接提供。</p>
+      <label for="token">管理 Token</label>
+      <input id="token" type="password" autocomplete="current-password" required autofocus>
+      <button type="submit" class="button primary">進入編輯器</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </section>
+
+  <div id="app" class="app-shell hidden">
+    <aside class="sidebar">
+      <header class="brand"><span class="brand-mark small">C</span><span>CrestRPG<br><small>內容編輯器</small></span></header>
+      <nav id="kind-nav" aria-label="RPG 內容分類"></nav>
+      <footer><span id="version"></span><span><button id="change-token" class="link-button">變更 Token</button><button id="logout" class="link-button">登出</button></span></footer>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div><p class="eyebrow">RPG 內容</p><h1 id="page-title">物品編輯器</h1></div>
+        <div class="actions"><button id="assets" class="button secondary">素材與資源包</button><button id="validate" class="button secondary">全量驗證</button><button id="new-draft" class="button primary">＋ 新增草稿</button></div>
+      </header>
+
+      <section class="content-grid">
+        <div class="panel list-panel">
+          <div class="panel-toolbar"><input id="search" type="search" placeholder="搜尋代碼或名稱…"><span id="draft-count" class="badge"></span></div>
+          <div id="draft-list" class="draft-list"></div>
+          <div id="empty" class="empty hidden"><strong>這個分類還沒有草稿</strong><span>點擊「新增草稿」開始建立。</span></div>
+        </div>
+
+        <section class="panel editor-panel">
+          <div id="editor-placeholder" class="empty"><strong>選擇一筆內容</strong><span>從左側清單選擇草稿進行編輯。</span></div>
+          <form id="editor-form" class="hidden">
+            <div class="editor-heading">
+              <div><p class="eyebrow">草稿編輯</p><h2 id="draft-heading"></h2></div>
+              <div class="actions"><button id="duplicate" type="button" class="button secondary">複製</button><button id="delete" type="button" class="button danger">刪除</button></div>
+            </div>
+            <div id="visual-fields" class="visual-fields"></div>
+            <details id="advanced-json" class="advanced-json">
+              <summary>進階 JSON 模式</summary>
+              <label for="draft-json">JSON 內容</label>
+              <textarea id="draft-json" spellcheck="false"></textarea>
+              <div id="json-status" class="field-help">進階模式會直接修改完整資料。</div>
+            </details>
+            <div class="form-footer"><span id="save-status" class="muted"></span><button type="submit" class="button primary">儲存草稿</button></div>
+          </form>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="key-dialog">
+    <form id="key-form" method="dialog">
+      <p class="eyebrow" id="dialog-eyebrow">新增草稿</p><h2 id="dialog-title">設定內容代碼</h2>
+      <label for="draft-key">代碼</label><input id="draft-key" pattern="[a-z0-9_-]{1,64}" placeholder="flame_sword" required>
+      <p class="field-help">只能使用小寫英文、數字、底線與連字號。</p>
+      <div class="dialog-actions"><button id="key-cancel" type="button" class="button secondary">取消</button><button id="key-confirm" type="submit" class="button primary">建立</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="validation-dialog"><div class="dialog-body"><p class="eyebrow">草稿驗證</p><h2 id="validation-title"></h2><div id="validation-results"></div><button id="validation-close" class="button primary">關閉</button></div></dialog>
+  <dialog id="token-dialog">
+    <form id="token-form">
+      <p class="eyebrow">安全設定</p><h2>變更管理 Token</h2>
+      <label for="new-token">新 Token</label><input id="new-token" type="password" minlength="16" maxlength="256" autocomplete="new-password" required>
+      <label for="confirm-token">再次輸入</label><input id="confirm-token" type="password" minlength="16" maxlength="256" autocomplete="new-password" required>
+      <p id="token-error" class="error" role="alert"></p>
+      <p class="field-help">更新後會立即使舊 Token 失效，不需要重啟伺服器。</p>
+      <div class="dialog-actions"><button id="token-cancel" type="button" class="button secondary">取消</button><button type="submit" class="button primary">更新 Token</button></div>
+    </form>
+  </dialog>
+  <dialog id="assets-dialog" class="wide-dialog">
+    <div class="dialog-body">
+      <div class="editor-heading"><div><p class="eyebrow">素材庫</p><h2>貼圖、模型與資源包</h2></div><button id="assets-close" class="button secondary">關閉</button></div>
+      <div class="asset-upload-grid">
+        <label class="upload-card">上傳 PNG 貼圖<input id="texture-upload" type="file" accept="image/png"><small>單檔上限 5 MB</small></label>
+        <label class="upload-card">上傳模型 JSON<input id="model-upload" type="file" accept="application/json,.json"><small>Blockbench 匯出的 Java 物品模型</small></label>
+      </div>
+      <div class="pack-actions"><button id="build-pack" class="button primary">建立資源包</button><button id="download-pack" class="button secondary" disabled>下載 ZIP</button><span id="pack-status" class="field-help"></span></div>
+      <div id="asset-list" class="asset-grid"></div>
+    </div>
+  </dialog>
+  <dialog id="material-dialog" class="wide-dialog">
+    <div class="dialog-body material-browser">
+      <div class="material-title"><div class="material-title-icon">🔍</div><div><h2>Minecraft 原版物品材質圖鑑庫</h2><p>點擊任意材質即可自動填入當前物品與欄位</p></div><button id="material-close" class="material-x" aria-label="關閉">×</button></div>
+      <div class="material-search-wrap"><input id="material-search" type="search" placeholder="搜尋材質名稱、ID、中文（如：sword、star、綠寶石、玻璃）…"><span>🔍</span></div>
+      <div id="material-category" class="material-categories">
+        <button class="active" data-category="all">🌐 全部</button><button data-category="weapon">⚔️ 武器</button><button data-category="armor">🛡️ 防具</button><button data-category="tool">⛏️ 工具</button><button data-category="block">🧱 方塊</button><button data-category="redstone">⚡ 紅石</button><button data-category="food">🍖 食物</button><button data-category="magic">🌟 魔法</button><button data-category="glass">🪟 玻璃片</button><button data-category="other">📦 其它物品</button>
+      </div>
+      <div class="material-summary"><strong id="material-status">正在載入圖鑑…</strong><span>向下捲動自動載入更多 · 點擊立即套用</span></div>
+      <div id="material-grid" class="material-grid"></div>
+      <button id="sync-minecraft" class="material-sync">重新從 Mojang 同步原版圖示與中文名稱</button>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
